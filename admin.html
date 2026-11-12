@@ -1,0 +1,825 @@
+<!DOCTYPE html>
+<html lang="sw">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#020817">
+<title>CONNECTION TZ | ADMIN</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800&family=Rajdhani:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<style>
+:root {
+  --bg:#020817;
+  --panel:#091629;
+  --cyan:#00e5ff;
+  --blue:#087bff;
+  --text:#eaf6ff;
+  --muted:#8ba4bd;
+  --border:rgba(0,229,255,.18);
+  --red:#ff4969;
+  --green:#00d69a;
+}
+* {box-sizing:border-box}
+body {
+  margin:0;
+  background:radial-gradient(circle at top,#102746,#020817 55%);
+  color:var(--text);
+  font-family:'Rajdhani',sans-serif;
+  min-height:100vh;
+}
+button,input,textarea,select {font:inherit}
+button {cursor:pointer}
+.topbar {
+  padding:17px 5%;
+  border-bottom:1px solid var(--border);
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  background:rgba(2,8,23,.9);
+  position:sticky;
+  top:0;
+  z-index:10;
+  backdrop-filter:blur(15px);
+}
+.brand {
+  font-family:Orbitron,sans-serif;
+  font-size:17px;
+  font-weight:800;
+  color:var(--cyan);
+}
+.brand small {
+  display:block;
+  font-family:Rajdhani,sans-serif;
+  color:var(--muted);
+  font-size:12px;
+  letter-spacing:3px;
+}
+.container {width:min(1150px,92%);margin:28px auto}
+.panel {
+  background:linear-gradient(145deg,#0d1c32,#050e1d);
+  border:1px solid var(--border);
+  border-radius:16px;
+  padding:22px;
+  margin-bottom:20px;
+}
+h1,h2,h3 {font-family:Orbitron,sans-serif}
+h2 {font-size:17px;color:var(--cyan);margin:0 0 18px}
+.hidden {display:none!important}
+.muted {color:var(--muted)}
+label {font-weight:700;color:#c9eaff}
+input,textarea,select {
+  width:100%;
+  padding:13px;
+  margin:7px 0 14px;
+  background:#020b19;
+  color:white;
+  border:1px solid var(--border);
+  border-radius:9px;
+  outline:none;
+}
+input:focus,textarea:focus,select:focus {
+  border-color:var(--cyan);
+}
+textarea {min-height:85px;resize:vertical}
+.btn {
+  border:0;
+  padding:12px 17px;
+  border-radius:9px;
+  background:linear-gradient(100deg,var(--blue),#00a9d6);
+  color:white;
+  font-weight:700;
+}
+.btn:disabled {opacity:.5;cursor:not-allowed}
+.btn.secondary {background:#17314e}
+.btn.danger {background:#a92542}
+.btn.small {padding:7px 11px;font-size:13px;margin:3px}
+.login {width:min(430px,92%);margin:10vh auto}
+.login h1 {color:var(--cyan);font-size:22px;text-align:center}
+.login p {text-align:center;color:var(--muted)}
+.stats {
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:14px;
+  margin-bottom:20px;
+}
+.stat {
+  padding:19px;
+  background:var(--panel);
+  border:1px solid var(--border);
+  border-radius:13px;
+}
+.stat strong {
+  display:block;
+  font-family:Orbitron,sans-serif;
+  color:var(--cyan);
+  font-size:25px;
+}
+.stat span {color:var(--muted)}
+.tabs {
+  display:flex;
+  gap:8px;
+  overflow-x:auto;
+  margin-bottom:20px;
+  padding-bottom:5px;
+}
+.tab {
+  white-space:nowrap;
+  padding:11px 17px;
+  background:#0a1a30;
+  border:1px solid var(--border);
+  border-radius:9px;
+  color:var(--muted);
+}
+.tab.active {
+  background:#06344a;
+  color:var(--cyan);
+  border-color:var(--cyan);
+}
+.grid {
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:15px;
+}
+.video-grid {
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(230px,1fr));
+  gap:14px;
+}
+.video-card {
+  background:#061225;
+  border:1px solid var(--border);
+  border-radius:12px;
+  overflow:hidden;
+}
+.video-card video {
+  width:100%;
+  height:155px;
+  object-fit:cover;
+  background:#000;
+}
+.video-info {padding:13px}
+.video-info h3 {margin:0 0 6px;color:var(--cyan);font-size:13px}
+.tag {
+  display:inline-block;
+  color:var(--cyan);
+  background:rgba(0,229,255,.09);
+  border:1px solid var(--border);
+  padding:3px 8px;
+  border-radius:20px;
+  font-size:12px;
+}
+.table-wrap {overflow-x:auto}
+table {width:100%;border-collapse:collapse;min-width:600px}
+th,td {
+  padding:12px;
+  border-bottom:1px solid var(--border);
+  text-align:left;
+  font-size:14px;
+}
+th {color:var(--cyan);font-family:Orbitron,sans-serif;font-size:11px}
+.notice {
+  padding:12px;
+  border-radius:9px;
+  background:#10243a;
+  color:#b8d8f2;
+  margin:12px 0;
+}
+.message {margin-top:12px;font-weight:700;overflow-wrap:anywhere}
+progress {width:100%;height:12px;accent-color:var(--cyan)}
+footer {
+  text-align:center;
+  padding:25px;
+  color:var(--muted);
+  border-top:1px solid var(--border);
+}
+@media(max-width:650px) {
+  .stats {grid-template-columns:1fr 1fr}
+  .grid {grid-template-columns:1fr}
+  .panel {padding:16px}
+  .brand {font-size:14px}
+}
+</style>
+</head>
+
+<body>
+
+<header class="topbar">
+  <div class="brand">
+    CONNECTION TZ
+    <small>ADMIN CONTROL PANEL</small>
+  </div>
+  <button id="logoutBtn" class="btn danger hidden">LOGOUT</button>
+</header>
+
+<section id="loginSection" class="login panel">
+  <h1>ADMIN LOGIN</h1>
+  <p>CONNECTION TZ MANAGEMENT SYSTEM</p>
+
+  <form id="loginForm">
+    <label>Email Address</label>
+    <input id="email" type="email" placeholder="Admin email" required>
+
+    <label>Password</label>
+    <input id="password" type="password" placeholder="Admin password" required>
+
+    <button id="loginBtn" class="btn" style="width:100%">
+      LOGIN TO DASHBOARD
+    </button>
+  </form>
+
+  <div id="loginMessage" class="message"></div>
+</section>
+
+<main id="dashboard" class="container hidden">
+
+  <div class="stats">
+    <div class="stat">
+      <strong id="totalVideos">0</strong>
+      <span>Total Videos</span>
+    </div>
+    <div class="stat">
+      <strong id="totalUsers">0</strong>
+      <span>Registered Users</span>
+    </div>
+    <div class="stat">
+      <strong>ACTIVE</strong>
+      <span>Admin Status</span>
+    </div>
+  </div>
+
+  <nav class="tabs">
+    <button class="tab active" data-tab="overview">Overview</button>
+    <button class="tab" data-tab="upload">Upload Video</button>
+    <button class="tab" data-tab="videos">Manage Videos</button>
+    <button class="tab" data-tab="users">Users</button>
+  </nav>
+
+  <section id="overview" class="tabContent">
+    <div class="panel">
+      <h2>WELCOME TO ADMIN DASHBOARD</h2>
+      <p>Simamia CONNECTION TZ hapa.</p>
+      <div class="notice">
+        Unaweza ku-upload video moja kwa moja kutoka kwenye simu yako.
+      </div>
+      <button class="btn" onclick="showTab('upload')">
+        + UPLOAD NEW VIDEO
+      </button>
+    </div>
+  </section>
+
+  <section id="upload" class="tabContent hidden">
+    <div class="panel">
+      <h2>UPLOAD NEW VIDEO</h2>
+
+      <form id="uploadForm">
+        <label>Video Title</label>
+        <input id="videoTitle" type="text" maxlength="100"
+          placeholder="Andika jina la video" required>
+
+        <label>Description</label>
+        <textarea id="videoDescription" maxlength="500"
+          placeholder="Maelezo ya video"></textarea>
+
+        <label>Select Category</label>
+        <select id="videoCategory" required>
+          <option value="free">FREE VIDEOS</option>
+          <option value="baikoko">BAIKOKO</option>
+          <option value="bongo">CONNECTION BONGO</option>
+          <option value="others">OTHERS</option>
+        </select>
+
+        <label>Chagua Video kutoka kwenye simu</label>
+        <input id="videoFile" type="file" accept="video/*" required>
+
+        <div class="notice">
+          Kikomo cha faili moja ni 500 MB. Hakikisha una internet ya kutosha.
+        </div>
+
+        <div id="selectedFile" class="muted"></div>
+
+        <div id="progressBox" class="hidden">
+          <progress id="uploadProgress" value="0" max="100"></progress>
+          <div id="progressText">Preparing upload...</div>
+        </div>
+
+        <button id="uploadBtn" class="btn" type="submit" style="width:100%">
+          UPLOAD VIDEO
+        </button>
+
+        <div id="uploadMessage" class="message"></div>
+      </form>
+    </div>
+  </section>
+
+  <section id="videos" class="tabContent hidden">
+    <div class="panel">
+      <h2>VIDEO MANAGEMENT</h2>
+
+      <div class="grid">
+        <input id="videoSearch" placeholder="Search video title...">
+        <select id="filterCategory">
+          <option value="">All Categories</option>
+          <option value="free">FREE VIDEOS</option>
+          <option value="baikoko">BAIKOKO</option>
+          <option value="bongo">CONNECTION BONGO</option>
+          <option value="others">OTHERS</option>
+        </select>
+      </div>
+
+      <button class="btn secondary" onclick="loadVideos()">REFRESH VIDEOS</button>
+      <div id="videoList" class="video-grid" style="margin-top:18px"></div>
+    </div>
+  </section>
+
+  <section id="users" class="tabContent hidden">
+    <div class="panel">
+      <h2>REGISTERED USERS</h2>
+      <input id="userSearch" placeholder="Search username or phone...">
+      <button class="btn secondary" onclick="loadUsers()">REFRESH USERS</button>
+
+      <div class="table-wrap" style="margin-top:15px">
+        <table>
+          <thead>
+            <tr>
+              <th>USERNAME</th>
+              <th>PHONE</th>
+              <th>JOINED</th>
+              <th>LAST SEEN</th>
+            </tr>
+          </thead>
+          <tbody id="userTable"></tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  POWERED BY YASSER TECH SOLUTIONS
+  <br>CONNECTION TZ ADMIN SYSTEM
+</footer>
+
+<script>
+/* SUPABASE CONFIGURATION */
+
+const SUPABASE_URL = "https://dhdihyawmlukyenwwlrw.supabase.co";
+const SUPABASE_KEY = "sb_publishable_xOz6rr4pQIZIDqV3wlwmpA_Ry1E3XPJ";
+const BUCKET = "connection-videos";
+
+const db = window.supabase.createClient(
+  SUPABASE_URL,
+  SUPABASE_KEY
+);
+
+let currentVideos = [];
+let currentUsers = [];
+
+const loginSection = document.getElementById("loginSection");
+const dashboard = document.getElementById("dashboard");
+const logoutBtn = document.getElementById("logoutBtn");
+
+function escapeHTML(value) {
+  return String(value ?? "").replace(/[&<>"']/g, char => ({
+    "&":"&amp;",
+    "<":"&lt;",
+    ">":"&gt;",
+    '"':"&quot;",
+    "'":"&#039;"
+  })[char]);
+}
+
+function showMessage(id, message, color="#00e5ff") {
+  const element = document.getElementById(id);
+  element.textContent = message;
+  element.style.color = color;
+}
+
+function categoryName(category) {
+  return {
+    free:"FREE VIDEOS",
+    baikoko:"BAIKOKO",
+    bongo:"CONNECTION BONGO",
+    others:"OTHERS"
+  }[category] || category;
+}
+
+function showDashboard() {
+  loginSection.classList.add("hidden");
+  dashboard.classList.remove("hidden");
+  logoutBtn.classList.remove("hidden");
+}
+
+function showLogin() {
+  loginSection.classList.remove("hidden");
+  dashboard.classList.add("hidden");
+  logoutBtn.classList.add("hidden");
+}
+
+/* ADMIN VERIFICATION */
+
+async function verifyAdmin() {
+  const {data:{session},error} = await db.auth.getSession();
+
+  if (error || !session) {
+    showLogin();
+    return false;
+  }
+
+  const {data,error:adminError} = await db
+    .from("admins")
+    .select("user_id")
+    .eq("user_id",session.user.id)
+    .maybeSingle();
+
+  if (adminError || !data) {
+    await db.auth.signOut();
+    showLogin();
+    showMessage(
+      "loginMessage",
+      "Akaunti hii haijaidhinishwa kama Admin.",
+      "#ff718b"
+    );
+    return false;
+  }
+
+  showDashboard();
+  await Promise.all([loadVideos(),loadUsers()]);
+  return true;
+}
+
+/* LOGIN */
+
+document.getElementById("loginForm").addEventListener("submit",async event=>{
+  event.preventDefault();
+
+  const email=document.getElementById("email").value.trim();
+  const password=document.getElementById("password").value;
+  const button=document.getElementById("loginBtn");
+
+  button.disabled=true;
+  button.textContent="PLEASE WAIT...";
+
+  const {error}=await db.auth.signInWithPassword({email,password});
+
+  button.disabled=false;
+  button.textContent="LOGIN TO DASHBOARD";
+
+  if(error) {
+    showMessage("loginMessage",error.message,"#ff718b");
+    return;
+  }
+
+  await verifyAdmin();
+});
+
+logoutBtn.addEventListener("click",async()=>{
+  await db.auth.signOut();
+  showLogin();
+});
+
+/* TABS */
+
+function showTab(tabName) {
+  document.querySelectorAll(".tabContent").forEach(section=>{
+    section.classList.add("hidden");
+  });
+
+  document.querySelectorAll(".tab").forEach(button=>{
+    button.classList.remove("active");
+  });
+
+  document.getElementById(tabName).classList.remove("hidden");
+
+  const active=document.querySelector(`[data-tab="${tabName}"]`);
+  if(active) active.classList.add("active");
+
+  if(tabName==="videos") loadVideos();
+  if(tabName==="users") loadUsers();
+}
+
+document.querySelectorAll(".tab").forEach(button=>{
+  button.addEventListener("click",()=>{
+    showTab(button.dataset.tab);
+  });
+});
+
+/* VIDEO FILE SELECTION */
+
+const fileInput=document.getElementById("videoFile");
+
+fileInput.addEventListener("change",()=>{
+  const file=fileInput.files[0];
+
+  document.getElementById("selectedFile").textContent=file
+    ? "Selected: "+file.name+" ("+(file.size/1048576).toFixed(2)+" MB)"
+    : "";
+});
+
+/* UPLOAD VIDEO */
+
+document.getElementById("uploadForm").addEventListener("submit",async event=>{
+  event.preventDefault();
+
+  const {data:{session}}=await db.auth.getSession();
+
+  if(!session) {
+    showMessage("uploadMessage","Tafadhali login tena.","#ff718b");
+    showLogin();
+    return;
+  }
+
+  const file=fileInput.files[0];
+  const title=document.getElementById("videoTitle").value.trim();
+  const description=document.getElementById("videoDescription").value.trim();
+  const category=document.getElementById("videoCategory").value;
+
+  if(!file || !file.type.startsWith("video/")) {
+    showMessage("uploadMessage","Chagua video sahihi kwanza.","#ff718b");
+    return;
+  }
+
+  if(file.size>500*1024*1024) {
+    showMessage("uploadMessage","Video imezidi 500 MB.","#ff718b");
+    return;
+  }
+
+  const allowed=["free","baikoko","bongo","others"];
+
+  if(!allowed.includes(category)) {
+    showMessage("uploadMessage","Category si sahihi.","#ff718b");
+    return;
+  }
+
+  const button=document.getElementById("uploadBtn");
+  const progressBox=document.getElementById("progressBox");
+  const progress=document.getElementById("uploadProgress");
+  const progressText=document.getElementById("progressText");
+
+  button.disabled=true;
+  button.textContent="UPLOADING...";
+  progressBox.classList.remove("hidden");
+  progress.value=10;
+  progressText.textContent="Uploading to Supabase Storage...";
+
+  let filePath=null;
+
+  try {
+    const extension=(file.name.split(".").pop()||"mp4")
+      .toLowerCase().replace(/[^a-z0-9]/g,"");
+
+    const fileName=Date.now()+"-"+crypto.randomUUID()+"."+extension;
+    filePath=category+"/"+fileName;
+
+    const {error:uploadError}=await db.storage
+      .from(BUCKET)
+      .upload(filePath,file,{
+        cacheControl:"3600",
+        contentType:file.type,
+        upsert:false
+      });
+
+    if(uploadError) throw uploadError;
+
+    progress.value=80;
+    progressText.textContent="Saving video information...";
+
+    const {data:publicData}=db.storage
+      .from(BUCKET)
+      .getPublicUrl(filePath);
+
+    const {error:insertError}=await db
+      .from("videos")
+      .insert({
+        title,
+        description,
+        category,
+        file_path:filePath,
+        video_url:publicData.publicUrl
+      });
+
+    if(insertError) {
+      await db.storage.from(BUCKET).remove([filePath]);
+      filePath=null;
+      throw insertError;
+    }
+
+    progress.value=100;
+    progressText.textContent="Upload completed!";
+
+    showMessage("uploadMessage","SUCCESS! Video imeongezwa.","#00d69a");
+
+    document.getElementById("uploadForm").reset();
+    document.getElementById("selectedFile").textContent="";
+
+    await loadVideos();
+    showTab("videos");
+
+  } catch(error) {
+    console.error(error);
+    showMessage(
+      "uploadMessage",
+      "Upload failed: "+(error.message||"Unknown error"),
+      "#ff718b"
+    );
+  } finally {
+    button.disabled=false;
+    button.textContent="UPLOAD VIDEO";
+  }
+});
+
+/* LOAD VIDEOS */
+
+async function loadVideos() {
+  const list=document.getElementById("videoList");
+  list.textContent="Loading videos...";
+
+  const {data,error}=await db
+    .from("videos")
+    .select("*")
+    .order("created_at",{ascending:false});
+
+  if(error) {
+    list.textContent="Error: "+error.message;
+    return;
+  }
+
+  currentVideos=data||[];
+  document.getElementById("totalVideos").textContent=currentVideos.length;
+  renderVideos();
+}
+
+function renderVideos() {
+  const list=document.getElementById("videoList");
+  const search=document.getElementById("videoSearch").value.toLowerCase();
+  const category=document.getElementById("filterCategory").value;
+
+  const filtered=currentVideos.filter(video=>
+    video.title.toLowerCase().includes(search) &&
+    (!category || video.category===category)
+  );
+
+  if(!filtered.length) {
+    list.textContent="Hakuna video zilizopatikana.";
+    return;
+  }
+
+  list.innerHTML=filtered.map(video=>`
+    <article class="video-card">
+      <video controls preload="metadata" playsinline>
+        <source src="${escapeHTML(video.video_url)}">
+      </video>
+      <div class="video-info">
+        <h3>${escapeHTML(video.title)}</h3>
+        <span class="tag">${escapeHTML(categoryName(video.category))}</span>
+        <p class="muted">${escapeHTML(video.description||"")}</p>
+        <button class="btn small secondary"
+          onclick="editVideo('${video.id}')">EDIT</button>
+        <button class="btn small danger"
+          onclick="deleteVideo('${video.id}')">DELETE</button>
+      </div>
+    </article>
+  `).join("");
+}
+
+document.getElementById("videoSearch").addEventListener("input",renderVideos);
+document.getElementById("filterCategory").addEventListener("change",renderVideos);
+
+/* EDIT VIDEO */
+
+async function editVideo(id) {
+  const video=currentVideos.find(item=>item.id===id);
+  if(!video) return;
+
+  const title=prompt("Badilisha title:",video.title);
+  if(title===null) return;
+
+  if(!title.trim()) {
+    alert("Title haiwezi kuwa tupu.");
+    return;
+  }
+
+  const description=prompt("Badilisha description:",video.description||"");
+  if(description===null) return;
+
+  const category=prompt(
+    "Category: free, baikoko, bongo, others",
+    video.category
+  );
+  if(category===null) return;
+
+  const cleanCategory=category.trim().toLowerCase();
+
+  if(!["free","baikoko","bongo","others"].includes(cleanCategory)) {
+    alert("Category si sahihi.");
+    return;
+  }
+
+  const {error}=await db.from("videos")
+    .update({
+      title:title.trim(),
+      description:description.trim(),
+      category:cleanCategory
+    })
+    .eq("id",id);
+
+  if(error) {
+    alert("Edit failed: "+error.message);
+    return;
+  }
+
+  alert("Video updated!");
+  await loadVideos();
+}
+
+/* DELETE VIDEO */
+
+async function deleteVideo(id) {
+  const video=currentVideos.find(item=>item.id===id);
+  if(!video) return;
+
+  if(!confirm("Una uhakika unataka kufuta "+video.title+"?")) return;
+
+  const {error:storageError}=await db.storage
+    .from(BUCKET)
+    .remove([video.file_path]);
+
+  if(storageError) {
+    alert("Imeshindikana kufuta faili: "+storageError.message);
+    return;
+  }
+
+  const {error:dbError}=await db.from("videos")
+    .delete()
+    .eq("id",id);
+
+  if(dbError) {
+    alert("Faili limefutwa lakini taarifa ya database haijafutika: "+dbError.message);
+    await loadVideos();
+    return;
+  }
+
+  alert("Video imefutwa.");
+  await loadVideos();
+}
+
+/* LOAD USERS */
+
+async function loadUsers() {
+  const table=document.getElementById("userTable");
+  table.innerHTML="<tr><td colspan='4'>Loading users...</td></tr>";
+
+  const {data,error}=await db
+    .from("users")
+    .select("username,phone,created_at,last_seen")
+    .order("created_at",{ascending:false});
+
+  if(error) {
+    table.innerHTML="<tr><td colspan='4'>"+escapeHTML(error.message)+"</td></tr>";
+    return;
+  }
+
+  currentUsers=data||[];
+  document.getElementById("totalUsers").textContent=currentUsers.length;
+  renderUsers();
+}
+
+function renderUsers() {
+  const table=document.getElementById("userTable");
+  const search=document.getElementById("userSearch").value.toLowerCase();
+
+  const filtered=currentUsers.filter(user=>
+    (user.username||"").toLowerCase().includes(search) ||
+    (user.phone||"").toLowerCase().includes(search)
+  );
+
+  if(!filtered.length) {
+    table.innerHTML="<tr><td colspan='4'>No users found.</td></tr>";
+    return;
+  }
+
+  table.innerHTML=filtered.map(user=>`
+    <tr>
+      <td>${escapeHTML(user.username)}</td>
+      <td>${escapeHTML(user.phone)}</td>
+      <td>${user.created_at?new Date(user.created_at).toLocaleString():"-"}</td>
+      <td>${user.last_seen?new Date(user.last_seen).toLocaleString():"-"}</td>
+    </tr>
+  `).join("");
+}
+
+document.getElementById("userSearch").addEventListener("input",renderUsers);
+
+/* START */
+
+db.auth.onAuthStateChange((event,session)=>{
+  if(event==="SIGNED_OUT") showLogin();
+});
+
+verifyAdmin();
+
+</script>
+</body>
+</html>
